@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Files{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>File Manager</h2>
+
+  <h3>Upload</h3>
+  <form method="post" action="/files/upload" enctype="multipart/form-data" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;">
+    <input type="file" name="file">
+    <button class="btn" type="submit">Upload</button>
+  </form>
+
+  <h3>Downloads</h3>
+  {% if files %}
+    <ul>
+      {% for f in files %}
+      <li><a href="/files/download?file={{ f }}">{{ f }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No files uploaded yet.</p>
+  {% endif %}
+
+  <h3>Direct Download</h3>
+  <form method="get" action="/files/download" style="display:flex;gap:0.5rem;">
+    <input type="text" name="file" placeholder="filename (e.g. report.txt)">
+    <button class="btn" type="submit">Download</button>
+  </form>
+</div>
+{% endblock %}

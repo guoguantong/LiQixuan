@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>User Lookup</h2>
+  <form method="get" style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+    <input type="text" name="q" placeholder="Search by username" value="{{ q }}">
+    <button class="btn" type="submit">Search</button>
+  </form>
+  {% if results %}
+    <table width="100%" style="border-collapse:collapse;">
+      <tr style="background:#f0f0f0;"><th>ID</th><th>Username</th><th>Email</th><th>Admin</th></tr>
+      {% for r in results %}
+      <tr style="border-top:1px solid #eee;">
+        <td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[3] }}</td><td>{{ r[4] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% elif q %}
+    <p>No user found for <em>{{ q }}</em>.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Lookup by Email</h3>
+  <form method="get" style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+    <input type="email" name="email" placeholder="Search by email" value="{{ eq }}">
+    <button class="btn" type="submit">Search</button>
+  </form>
+  {% if email_results %}
+    <table width="100%" style="border-collapse:collapse;">
+      <tr style="background:#f0f0f0;"><th>ID</th><th>Username</th><th>Email</th></tr>
+      {% for r in email_results %}
+      <tr style="border-top:1px solid #eee;">
+        <td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[3] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% elif eq %}
+    <p>No user found for <em>{{ eq }}</em>.</p>
+  {% endif %}
+</div>
+{% endblock %}

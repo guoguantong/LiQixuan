@@ -1,0 +1,7 @@
+Flask==0.12.4
+Werkzeug==0.15.5
+Jinja2==2.11.3
+requests==2.19.1
+PyYAML==5.1
+Pillow==8.0.0
+paramiko==2.4.1

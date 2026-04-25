@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Welcome, {{ username }}</h2>
+  <p>IntraPanel — internal admin dashboard.</p>
+  <ul>
+    <li><a href="/users">User Management</a> — search users by username or email</li>
+    <li><a href="/files">File Manager</a> — upload and download internal files</li>
+    <li><a href="/diag">Diagnostics</a> — network ping tool</li>
+    <li><a href="/api/token">Generate API Token</a></li>
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+
+┌──── ○○○ ────┐
+│ Semgrep CLI │
+└─────────────┘
+
+⠹ Loading rules...                                                                                                                   Scanning 13 files (only git-tracked) with 1 Code rule:
+
+  CODE RULES
+  Scanning 3 files.
+
+  SUPPLY CHAIN RULES
+
+  No rules to run.
+
+
+  PROGRESS
+
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00                                                                              
+
+
+┌─────────────────┐
+│ 2 Code Findings │
+└─────────────────┘
+
+    target\code-repo\app.py
+   ❯❯❱ rules.test_rule
+          ❰❰ Blocking ❱❱
+          command injection
+
+          134┆ result = subprocess.call(["sh", "-c", "cat " + filepath], shell=True)
+            ⋮┆----------------------------------------
+          197┆ output = subprocess.check_output("ping -c 1 " + host, shell=True,
+          198┆                                  stderr=subprocess.STDOUT).decode()
+
+
+
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 2 (2 blocking)
+ • Rules run: 1
+ • Targets scanned: 3
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 1 rule on 3 files: 2 findings.
