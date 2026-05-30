@@ -4,21 +4,29 @@
 void gadget_trap(void) {
     printf("Oops! You are trapped in a dead loop.\n");
     while (1) {
-        /* infinite loop trap */
+        /* 故意制造死循环，易诱发路径爆炸或资源耗尽 */
     }
 }
 
 int check_password(char *input) {
+    if (strlen(input) < 4) {
+        puts("Wrong password!");
+        return 0;
+    }
     if (input[0] == 'A') {
         if (input[1] == 'B') {
             gadget_trap();
         }
         if (input[1] == 'Z') {
-            printf("Success! Flag is found.\n");
-            return 1;
+            if ((input[2] ^ 0x12) == 'q') {
+                if ((input[3] + 3) == 'H') {
+                    puts("Success! Flag is found.");
+                    return 1;
+                }
+            }
         }
     }
-    printf("Wrong password!\n");
+    puts("Wrong password!");
     return 0;
 }
 
