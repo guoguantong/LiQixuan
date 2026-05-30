@@ -25,25 +25,79 @@ python solve_final.py
 ===============================================================
   Crackme 符号执行求解结果
 ===============================================================
-  密码: AZ????????
+  符号执行求解的密码: AZ????????
+  有效载荷 (前2字符): AZ
   Hex:  415a3f3f3f3f3f3f3f3f
-  说明: 前两个字符 AZ 确定，后续字符可以是任意值
+  实际运行 crackme 输出:
+  *** Success! Flag is found. ***
 ===============================================================
 
-ReAct Agent 求解过程:
-  Round 1: load_binary      → AMD64, 64-bit, 入口 0x1026220
-  Round 2: analyze_functions → main @ 0x10263d0, check_password @ 0x1026270, gadget_trap @ 0x1026260
-  Round 3: locate_targets   → find (Success) @ 0x10263a8, avoid (Trap) @ 0x1026260
-  Round 4: symbolic_explore → Found: 1, Avoided: 1, Deadended: 0
-  Round 5: extract_password → 密码: AZ????????
+ReAct Agent 求解过程演示
+===============================================================
+
+--- Round 1 ---
+Thought: 第一步需要加载二进制文件，了解程序的架构和基本信息。
+Action:  load_binary
+Observation:
+二进制加载成功。
+  架构: AMD64
+  位数: 64-bit
+  入口: 0x1026220
+
+--- Round 2 ---
+Thought: 第二步进行 CFG 分析，识别所有函数。
+Action:  analyze_functions
+Observation:
+CFG 分析完成，函数列表:
+  main: 0x10263d0
+  check_password: 0x1026270
+  gadget_trap: 0x1026260
+
+--- Round 3 ---
+Thought: 第三步在 check_password 中定位 Success 和 Trap 路径的关键地址。
+Action:  locate_targets
+Observation:
+关键地址定位:
+  find  (Success 路径): 0x10263a8
+  avoid (Trap 路径):    0x1026260
+
+--- Round 4 ---
+Thought: 第四步使用 SimulationManager.explore(find, avoid) 进行符号执行。
+Action:  symbolic_explore
+Observation:
+符号执行探索完成。
+  Found (成功路径): 1
+  Avoided (已避开): 1
+  Deadended: 0
+
+--- Round 5 ---
+Thought: 第五步，从符号执行找到的成功状态中求解约束，提取具体密码。
+Action:  extract_password
+Observation:
+密码提取成功！密码: AZ????????
+
+--- Round 6 ---
+Thought: 最后一步，用提取的密码实际运行 crackme 程序进行验证。
+Action:  verify_and_run
+Observation:
+用密码 "AZ" 实际运行 crackme:
+>>> Success! Flag is found.
+
+===============================================================
+  >>> 最终验证结果 <<<
+===============================================================
+  Agent 通过符号执行求解的密码: AZ
+  实际运行 crackme 的输出:
+  *** Success! Flag is found. ***
+===============================================================
 ```
 
 实际密码验证：
 ```
-$ echo "AZ" | ./crackme.exe      → Success! Flag is found.
+$ echo "AZ" | ./crackme.exe       → Success! Flag is found.
 $ echo "AZanything" | ./crackme.exe → Success! Flag is found.
-$ echo "AB" | ./crackme.exe      → Oops! You are trapped... (死循环)
-$ echo "XX" | ./crackme.exe      → Wrong password!
+$ echo "AB" | ./crackme.exe       → Oops! You are trapped... (死循环)
+$ echo "XX" | ./crackme.exe       → Wrong password!
 ```
 
 ## crackme 程序分析
