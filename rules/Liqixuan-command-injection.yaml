@@ -1,0 +1,14 @@
+rules:
+- id: test_rule
+  message: command injection
+  severity: ERROR
+  languages: [python]
+  mode: taint
+  pattern-sources:
+    - pattern: request.form.get(...)
+    - pattern: request.args.get(...)
+  pattern-sinks:
+    - pattern: subprocess.$FUNC(..., shell=True, ...)
+      metavariable-regex:
+        metavariable: $FUNC
+        regex: "^(check_output|run|call|Popen)$"
