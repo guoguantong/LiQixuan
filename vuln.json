@@ -1,0 +1,5 @@
+{
+  "vuln_type": "stack_buffer_overflow",
+  "location": "main (0x401382): __strcpy_chk call",
+  "cause": "不可信的用户输入由 fgets 从 stdin 读入（最多 128 字节），经过 strlen 长度检查（允许 ≤100 字节），随后由 __strcpy_chk 复制到栈缓冲区，但 dest_size 参数仅为 16 字节，与实际栈帧 160 字节（sub rsp, 0xa0）严重不匹配，导致输入超过 16 字节时发生栈缓冲区溢出"
+}

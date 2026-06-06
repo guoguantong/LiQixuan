@@ -1,0 +1,26 @@
+# ReAct Agent — 二进制静态漏洞挖掘
+# r2 + Ghidra + LangChain Tool Calling
+#
+# 安装:
+#   pip install -r requirements.txt
+#
+# r2 安装 (Linux):
+#   sudo apt install radare2
+#   # 或: git clone https://github.com/radareorg/radare2 && cd radare2 && sys/install.sh
+#
+# r2 安装 (Windows):
+#   从 https://github.com/radareorg/radare2/releases 下载 radare2_windows.zip
+#   解压后添加到 PATH
+#
+# Ghidra 安装:
+#   从 https://github.com/NationalSecurityAgency/ghidra/releases 下载
+#   解压到 /opt/ghidra (Linux) 或 C:\ghidra (Windows)
+#   确保 analyzeHeadless (或 analyzeHeadless.bat) 在 PATH 中
+#
+# 如无 r2/Ghidra，Agent 自动使用 demo 模式（预计算分析结果）
+
+langchain-core>=0.1.0
+langchain-openai>=0.1.0
+openai>=1.0.0
+pyelftools>=0.29
+capstone>=5.0.0
