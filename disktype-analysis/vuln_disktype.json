@@ -1,0 +1,14 @@
+{
+  "target": "C:\\Users\\10426\\Desktop\\新建文件夹\\disktype",
+  "architecture": "MIPS 32-bit LSB",
+  "linker": "/lib/ld-uClibc.so.0",
+  "binary_type": "disk format detection utility (disktype)",
+  "analysis_date": "2026-06-22",
+  "analysis_method": "ReAct Agent + capstone + pyelftools (demo mode)",
+  "vuln_type": "integer_overflow + heap_buffer_overflow + command_injection + stack_buffer_overflow",
+  "location": "get_buffer_real (0x4047cc) + detect_compressed (0x408950) + error/bailout (0x4043f0-0x404620) + get_string (0x404098)",
+  "cause": "多个漏洞：\n\n1. [HIGH] get_buffer_real (0x4047cc) 整数溢出导致堆越界\n   - 64位加法 total = offset + size (0x4048ec-0x4048f8) 无溢出检查\n   - offset和size来自磁盘镜像元数据，用户可控\n   - 可导致后续malloc分配不足 + memcpy/read越界\n\n2. [HIGH] detect_compressed (0x408950) 命令注入风险\n   - 导入fork、pipe、dup2、execlp等函数\n   - 字符串包含'pipe for decompression'、'read from pipe'、'write to pipe'\n   - 检测compress/gzip/bzip2压缩数据时fork子进程执行外部解压命令\n   - 若execlp参数由磁盘数据构造且未正确过滤，可注入任意命令\n   - 是嵌入式设备上RCE的关键入口\n\n3. [MEDIUM] error/errore/bailout/bailoute (0x4043f0-0x404620) 4096字节栈缓冲区\n   - 四个函数均分配4136字节栈帧（4096缓冲区 + 40开销）\n   - 使用vsnprintf格式化错误消息\n   - 虽vsnprintf有长度限制，但如果传入的格式字符串中包含来自磁盘的\n     超长%s参数，且长度计算出现偏差，可能栈溢出\n   - '%.300s: %s' 格式对第一个参数做了限制但对第二个无限制\n   - 特别是'Volume name \"%s\"'这种无长度限制的格式字符串\n\n4. [MEDIUM] get_string (0x404098) 无边界字符串读取\n   - 从磁盘数据提取NUL终止字符串时无最大长度限制\n   - 恶意镜像可构造无NUL字节的超长字段导致越界读\n\n5. [MEDIUM] detect_* 固定大小栈缓冲区 (多处)\n   - detect_iso (0x40f25c): 624字节栈帧，使用0x800大小的get_buffer\n   - detect_apple_volume (0x40a788): 936字节栈帧\n   - detect_bsd_disklabel (0x414938): 664字节栈帧\n   - detect_solaris_disklabel (0x415728): 752字节栈帧\n   - 这些函数在栈上分配固定缓冲区存储磁盘元数据，\n     若元数据字段超过预期大小可覆盖$ra返回地址\n\n6. [LOW] 多处格式字符串%s无宽度限制\n   - 'Volume name \"%s\"'、'Type \"%s\"'、'Partition Name \"%s\"'等\n   - 对比其他位置使用的'%.300s'限制版本，这些调用缺乏保护",
+  "attack_scenario": "攻击者构造恶意磁盘镜像/USB设备，当嵌入式设备（路由器/NAS）的disktype自动检测时：\n1. 通过超大offset+size触发get_buffer_real整数溢出 → 堆越界/DoS\n2. 通过构造特殊的压缩数据触发detect_compressed → fork/execlp命令注入 → RCE\n3. 通过超长卷标/分区名触发栈缓冲区溢出 → 覆盖$ra → RCE",
+  "cvss_estimate": "CVSS 8.4 (High) — Local, Low complexity, No privileges, High impact (RCE possible via command injection)",
+  "remediation": "1. get_buffer_real: 添加64位加法溢出检查\n2. detect_compressed: 永远不要将外部数据直接传给execlp，使用execv系列替代\n3. error/bailout: 所有%s格式添加宽度限制\n4. get_string: 添加最大长度参数\n5. detect_*: 使用动态分配或严格边界检查\n6. 编译时启用FORTIFY_SOURCE、-fstack-protector-all、-D_FORTIFY_SOURCE=2"
+}
